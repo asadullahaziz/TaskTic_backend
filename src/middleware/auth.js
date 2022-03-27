@@ -3,11 +3,9 @@ const jwt = require("jsonwebtoken");
 
 async function auth(req, res, next) {
     try {
-        let token = req.header("authenctication").replace("Bearer ", "");
-        console.log(token);
+        let token = req.header("Authorization").replace("Bearer ", "");
         let decodedToken = jwt.verify(token, "TaskTicSuperSecureSecretKey");
-        console.log(decodedToken);
-        let user = User.findOne({_id: decodedToken._id, "tokens.token": token});
+        let user = await User.findOne({_id: decodedToken._id, "tokens.token": token});
         
         if(!user) {
             throw new Error("Authentication Error");
@@ -19,7 +17,7 @@ async function auth(req, res, next) {
         next();
     }
     catch (error) {
-        res.status(400).error({error});
+        res.status(400).send({error: error.message});
     }
 }
 

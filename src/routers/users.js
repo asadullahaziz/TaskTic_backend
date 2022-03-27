@@ -9,7 +9,7 @@ router.post("/users", async (req, res) => {
         const user = new User(req.body);
         await user.save();
         let token = await user.generateAuthToken();
-        res.send({user, token});
+        res.status(201).send({user, token});
     } 
     catch(error) {
         res.status(500).send(error);
@@ -18,12 +18,7 @@ router.post("/users", async (req, res) => {
 
 // Read
 router.get("/users/me", auth, async (req, res) => {
-    try {
-        res.status(200).send(req.user);
-    }
-    catch(error) {
-        res.status(400).send({error});
-    }
+    res.send(req.user);
 });
 
 // router.get("/users", async (req, res) => {
@@ -97,6 +92,30 @@ router.post("/users/login", async (req, res) => {
     }
     catch(error) {
         res.status(400).send({error: "Incorrect credendials."});
+    }
+});
+
+router.post("/users/logout", auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter(token => token.token !== req.token);
+        await req.user.save();
+        
+        res.send({message: "Logged Out"});
+    }
+    catch(error) {
+        res.status(500).send({error: error.message});
+    }
+});
+
+router.post("/users/logoutAll", auth, async (req, res) => {
+    try {
+        req.user.tokens = [];
+        await req.user.save();
+        
+        res.send({message: "Logged out of all sessions"});
+    }
+    catch(error) {
+        res.status(500).send({error: error.message});
     }
 });
 
