@@ -7,7 +7,6 @@ const auth = require("../middleware/auth");
 router.post("/users", async (req, res) => {
     try {
         const user = new User(req.body);
-        await user.save();
         let token = await user.generateAuthToken();
         res.status(201).send({user, token});
     } 
@@ -48,13 +47,9 @@ router.get("/users/me", auth, async (req, res) => {
 // });
 
 // Update
-router.patch("/users/:id", async (req, res) => {
+router.patch("/users/me", auth,  async (req, res) => {
     try{
-        let user = await User.findById(req.params.id);
-        
-        if(!user) {
-            res.status(400).send({error: "No user found."});
-        }
+        let user = req.user;
         
         let userUpdatekeys = Object.keys(req.body);
         userUpdatekeys.forEach((key) => user[key] = req.body[key]);
@@ -70,13 +65,10 @@ router.patch("/users/:id", async (req, res) => {
 });
 
 // Delete
-router.delete("/users/:id", async (req, res) => {
+router.delete("/users/me", auth, async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id);
-        if(!user) {
-            res.status(400).send({error: "No user found."});
-        }
-        res.status(200).send(user);
+        await req.user.remove();
+        res.status(200).send(req.user);
     }
     catch(error) {
         res.status(500).send(error);

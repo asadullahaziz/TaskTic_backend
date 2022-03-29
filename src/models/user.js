@@ -60,6 +60,14 @@ userSchema.method("generateAuthToken", async function(){
     return token;
 });
 
+// hide sensitive data from client (toJSON method from a Js object is called by stringify method everytime and its return value is returned)
+userSchema.method("toJSON", function() {
+    let user = this.toObject();
+    delete user.password;
+    delete user.tokens;
+    return user;
+});
+
 // Schema middle ware
 // hashing user password in save and update(if changed)
 userSchema.pre("save", async function(next) {
