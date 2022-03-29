@@ -16,7 +16,7 @@ router.post("/users", async (req, res) => {
 });
 
 // Read
-router.get("/users/me", auth, async (req, res) => {
+router.get("/users", auth, async (req, res) => {
     res.send(req.user);
 });
 
@@ -47,7 +47,7 @@ router.get("/users/me", auth, async (req, res) => {
 // });
 
 // Update
-router.patch("/users/me", auth,  async (req, res) => {
+router.patch("/users", auth,  async (req, res) => {
     try{
         let user = req.user;
         
@@ -65,7 +65,7 @@ router.patch("/users/me", auth,  async (req, res) => {
 });
 
 // Delete
-router.delete("/users/me", auth, async (req, res) => {
+router.delete("/users", auth, async (req, res) => {
     try {
         await req.user.remove();
         res.status(200).send(req.user);

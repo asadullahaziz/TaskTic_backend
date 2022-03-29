@@ -19,7 +19,7 @@ const Task = new Schema({
     },
     completed: {
         type: Boolean,
-        default: true
+        default: false
     },
     userId: {
         type: ObjectId,
