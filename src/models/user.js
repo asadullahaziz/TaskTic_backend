@@ -35,6 +35,13 @@ const userSchema = new Schema({
     }]
 });
 
+// schema virtual methods
+userSchema.virtual("tasks", {
+    ref: "Task",
+    localField: "_id",
+    foreignField: "user"
+});
+
 // Schema Helper Methods
 userSchema.static("findByCredentials", async function(email, password) {
     const user = await this.findOne({email});
