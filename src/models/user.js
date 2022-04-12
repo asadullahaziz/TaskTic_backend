@@ -2,6 +2,7 @@ const { Schema, model } = require("mongoose");
 const { isEmail } = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Task = require("./task");
 
 const tokenSecretKey = "TaskTicSuperSecureSecretKey";
 
@@ -35,7 +36,7 @@ const userSchema = new Schema({
     }]
 });
 
-// schema virtual methods
+// schema virtual obj
 userSchema.virtual("tasks", {
     ref: "Task",
     localField: "_id",
@@ -82,6 +83,12 @@ userSchema.pre("save", async function(next) {
     if(user.isModified("password")) {
         user.password = await bcrypt.hash(user.password, 8);
     }
+    next();
+});
+
+// remove user tasks when a user is deleted
+userSchema.pre("remove", async function (next) {
+    await Task.deleteMany({user: this._id});
     next();
 });
 
